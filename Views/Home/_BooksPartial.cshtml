@@ -1,0 +1,33 @@
+@model List<Book>
+<link rel="stylesheet" href="~/css/books.css" asp-append-version="true" />
+<div class="books-container">
+    @foreach(var item in @Model)
+    {
+        <div class="book-card">
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="action-buttons">
+                    <a href="#" onclick="openEditModal(@item.Id, '@item.Title', '@item.Author', '@item.Genre', '@item.PublishedDate.ToString("yyyy-MM-dd")')"><button type="button" class="action-btn edit-btn">Edit</button></a>
+                    <a href="#" onclick="DeleteBook(event, @item.Id)"><button type="button" class="action-btn delete-btn">Delete</button></a>
+                </div>
+            }
+            else if (item.Status == "Available")
+            {
+                <div class="action-buttons">
+                    <a href="#" onclick="openBorrowModal(@item.Id, '@item.Title', '@item.Author')"><button type="button" class="action-btn borrow-btn">Borrow</button></a>
+                </div>
+            }
+            else if (item.Status == "Borrowed" && item.UserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+            {
+                <div class="action-buttons">
+                    <a href="#" onclick="returnBook(@item.Id)"><button type="button" class="action-btn return-btn">Return</button></a>
+                </div>
+            }
+            <h2>@item.Title</h2>
+            <h3>Author: @item.Author</h3>
+            <h3>Genre: @item.Genre</h3>
+            <h3>Published: @item.PublishedDate</h3>
+            <h3>Status: @item.Status</h3>
+        </div>
+    }
+</div>

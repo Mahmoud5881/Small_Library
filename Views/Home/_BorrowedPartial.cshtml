@@ -1,0 +1,24 @@
+@model List<Book>
+<link rel="stylesheet" href="~/css/books.css" asp-append-version="true" />
+<div class="books-container">
+    @foreach(var item in @Model)
+    {
+        <div class="book-card">
+            @if (User.IsInRole("Admin"))
+            {
+                <div class="action-buttons">
+                    <a href="#" onclick="DeleteBorrowed(event, @item.Id)"><button type="button" class="action-btn delete-btn">Delete</button></a>
+                </div>
+            }
+            else
+            {
+                <div class="action-buttons">
+                    <a href="#" onclick="DeleteBorrowed(event, @item.Id)"><button type="button" class="action-btn delete-btn">Return</button></a>
+                </div>
+            }
+            <h2>@item.Title</h2>
+            <h3>Borrower: @(ViewData.ContainsKey(item.Title) ? ViewData[item.Title] : "Unknown")</h3>
+            <h3>Return Date: @item.ReturnDate</h3>
+        </div>
+    }
+</div>

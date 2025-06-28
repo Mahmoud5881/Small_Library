@@ -1,0 +1,47 @@
+@model Small_Library.ViewModels.RegisterViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/register.css" asp-append-version="true" />
+</head>
+<body>
+<div class="centered-container">
+    <div class="switcher">
+        <button class="active">Sign Up</button>
+        <a href="/Account/Login" class="switcher-link"><button type="button">Login</button></a>
+    </div>
+    <form asp-action="Register" class="register-card">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <label asp-for="Username">Username</label>
+        <input asp-for="Username" placeholder="Enter your username" />
+        <span asp-validation-for="Username"></span>
+
+        <label asp-for="Email">Email</label>
+        <input asp-for="Email" placeholder="Enter your email" />
+        <span asp-validation-for="Email"></span>
+
+        <label asp-for="PhoneNumber">Phone Number</label>
+        <input asp-for="PhoneNumber" placeholder="Enter your phone number" />
+        <span asp-validation-for="PhoneNumber"></span>
+
+        <label asp-for="Password">Password</label>
+        <input asp-for="Password" placeholder="Create a password" />
+        <span asp-validation-for="Password"></span>
+        <div style="font-size:12px;color:#888;margin-bottom:10px;">Must be at least 8 characters.</div>
+
+        <label asp-for="ConfirmPassword">Confirm Password</label>
+        <input asp-for="ConfirmPassword" placeholder="Confirm your password" />
+        <span asp-validation-for="ConfirmPassword"></span>
+
+        <button type="submit" class="register-btn">Sign Up</button>
+    </form>
+</div>
+</body>
+</html>

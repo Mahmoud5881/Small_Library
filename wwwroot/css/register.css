@@ -1,0 +1,98 @@
+body {
+    background: #121212;
+    font-family: 'Palanquin', sans-serif;
+    min-height: 100vh;
+    margin: 0;
+}
+.centered-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+.switcher {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+}
+.switcher button {
+    background: #444444;
+    border: none;
+    border-radius: 25px;
+    padding: 10px 32px;
+    font-size: 18px;
+    font-family: 'Palanquin', sans-serif;
+    margin: 0 4px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    color: #fff;
+    cursor: pointer;
+    font-weight: 700;
+}
+.switcher .active {
+    background: #444444;
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(68,68,68,0.10);
+}
+.register-card {
+    background: #d9d9d9;
+    border-radius: 16px;
+    box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+    padding: 40px 32px 32px 32px;
+    width: 370px;
+    max-width: 90vw;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+.register-card h2 {
+    margin-bottom: 24px;
+    font-size: 24px;
+    color: #fff;
+    text-align: center;
+}
+.register-card label {
+    font-family: 'Palanquin', sans-serif;
+    font-weight: 500;
+    color: #333;
+    margin-bottom: 5px;
+    display: block;
+}
+.register-card input {
+    padding: 12px 14px;
+    border-radius: 12px;
+    border: 1px solid #d9d9d9;
+    font-size: 15px;
+    font-family: 'Palanquin', sans-serif;
+    margin-bottom: 2px;
+    background: #fff;
+    color: #121212;
+}
+.register-card input:focus {
+    outline: none;
+    border-color: #6c63ff;
+}
+.register-btn {
+    font-family: 'Palanquin', sans-serif;
+    font-weight: 600;
+    font-size: 16px;
+    color: white;
+    background: #444444;
+    border: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 20px;
+}
+.terms {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 13px;
+    color: #888;
+}
+.terms a {
+    color: #6c63ff;
+    text-decoration: underline;
+} 

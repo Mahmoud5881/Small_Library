@@ -1,0 +1,18 @@
+body {
+  background-color: #121212;
+  font-family: 'Palanquin', sans-serif;
+}
+
+.navbar {
+  background-color: #444444 !important;
+  height: calc(128 / 1080 * 100vh);
+  min-height: 0;
+  border-bottom: none !important;
+}
+
+.navbar .navbar-brand {
+  margin-left: calc(78 / 1920 * 100vw);
+  font-size: 24px;
+  color: #fff !important;
+  font-family: 'Lexend Deca', sans-serif;
+} 
