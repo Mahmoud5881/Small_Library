@@ -3,6 +3,7 @@ using Small_Library.Models;
 using Small_Library.Services;
 using Small_Library.ViewModels;
 using System.Diagnostics;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 
@@ -11,15 +12,15 @@ namespace Small_Library.Controllers
     [Authorize]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
         private readonly IBookService _bookService;
         private readonly UserManager<IdentityUser> _userManager;
+        private readonly IAuditService _auditService;
 
-        public HomeController(ILogger<HomeController> logger, IBookService bookService,UserManager<IdentityUser> userManager)
+        public HomeController(ILogger<HomeController> logger, IBookService bookService,UserManager<IdentityUser> userManager, IAuditService auditService)
         {
-            _logger = logger;
             _bookService = bookService;
             _userManager = userManager;
+            _auditService = auditService;
         }
 
         public async Task<IActionResult> Index()
@@ -91,11 +92,20 @@ namespace Small_Library.Controllers
         public async Task<IActionResult> DeleteBook(int id)
         {
             var books = await _bookService.GetAllAsync();
+            var book = books.FirstOrDefault(b => b.Id == id);
+            var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+            await _auditService.LogActionAsync(
+                User.FindFirstValue(ClaimTypes.NameIdentifier),
+                "Delete Book",
+                $"Book:{book.Title} has been deleted",
+                ip
+            );
             await _bookService.DeleteAsync(id);
             return PartialView("_BooksPartial",books);
         }
         
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ReturnBook(int id)
         {
             var book = await _bookService.GetByIdAsync(id);
@@ -109,6 +119,13 @@ namespace Small_Library.Controllers
                     book.UserId = null;
                     book.ReturnDate = null;
                     await _bookService.UpdateAsync(book);
+                    var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+                    await _auditService.LogActionAsync(
+                        currentUser.Id,
+                        "Return Book",
+                        $"Book:{book.Title} has been returned",
+                        ip
+                    );
                     var books = await _bookService.GetAllAsync();
                     return PartialView("_BooksPartial", books);
                 }
@@ -121,6 +138,7 @@ namespace Small_Library.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateBook([FromBody] Book book)
         {
             if (ModelState.IsValid)
@@ -135,6 +153,13 @@ namespace Small_Library.Controllers
                     // Status is not updated - it should remain unchanged
                     
                     await _bookService.UpdateAsync(existingBook);
+                    var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+                    await _auditService.LogActionAsync(
+                        User.FindFirstValue(ClaimTypes.NameIdentifier),
+                        "Update Book",
+                        $"Book:{book.Title} has been updated",
+                        ip
+                    );
                     return Json(new { success = true });
                 }
             }
@@ -142,6 +167,7 @@ namespace Small_Library.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AddBook([FromBody] Book book)
         {
             if (ModelState.IsValid)
@@ -152,6 +178,14 @@ namespace Small_Library.Controllers
                 book.ReturnDate = null;
                 
                 await _bookService.AddAsync(book);
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+                await _auditService.LogActionAsync(userId, 
+                    "Add Book",
+                $"Book: {book.Title} has been added", 
+                    ip);
+
                 return Json(new { success = true });
             }
             return Json(new { success = false });
@@ -166,6 +200,7 @@ namespace Small_Library.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> AssignBook([FromBody] AssignBookModel model)
         {
             if (ModelState.IsValid)
@@ -182,6 +217,16 @@ namespace Small_Library.Controllers
                         book.ReturnDate = DateTime.Parse(model.ReturnDate);
                         
                         await _bookService.UpdateAsync(book);
+                        
+                        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+                        await _auditService.LogActionAsync(
+                            userId, 
+                            "Assign Book",
+                            $"Book: {book.Title} has been assigned",
+                            ip);
+
                         return Json(new { success = true });
                     }
                     else
@@ -198,6 +243,7 @@ namespace Small_Library.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> BorrowBook([FromBody] BorrowBookModel model)
         {
             if (ModelState.IsValid)
@@ -214,6 +260,16 @@ namespace Small_Library.Controllers
                         book.ReturnDate = DateTime.Parse(model.ReturnDate);
                         
                         await _bookService.UpdateAsync(book);
+                        
+                        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
+
+                        await _auditService.LogActionAsync(
+                            userId, 
+                            "Borrow Book",
+                            $"Book: {book.Title} has been Borrowed",
+                            ip);
+                        
                         return Json(new { success = true });
                     }
                     else

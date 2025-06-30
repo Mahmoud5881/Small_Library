@@ -153,6 +153,5 @@ D:\Backend\MVC\Small Library\Small Library\obj\Debug\net8.0\refint\Small Library
 D:\Backend\MVC\Small Library\Small Library\obj\Debug\net8.0\Small Library.pdb
 D:\Backend\MVC\Small Library\Small Library\obj\Debug\net8.0\Small Library.genruntimeconfig.cache
 D:\Backend\MVC\Small Library\Small Library\obj\Debug\net8.0\ref\Small Library.dll
-D:\Backend\MVC\Small Library\Small Library\bin\Debug\net8.0\Small Library.staticwebassets.endpoints.json
-D:\Backend\MVC\Small Library\Small Library\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-D:\Backend\MVC\Small Library\Small Library\obj\Debug\net8.0\staticwebassets\msbuild.Small Library.Microsoft.AspNetCore.StaticWebAssetEndpoints.props
+D:\Backend\MVC\Small Library\Small Library\obj\Debug\net8.0\Small Library.sourcelink.json
+D:\Backend\MVC\Small Library\Small Library\bin\Debug\net8.0\System.Formats.Asn1.dll

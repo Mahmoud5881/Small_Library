@@ -5,6 +5,7 @@ using Small_Library.Repositories;
 using Small_Library.Models;
 using Small_Library.Services;
 using Microsoft.Extensions.Options;
+using System.Threading.RateLimiting;
 
 namespace Small_Library
 {
@@ -27,6 +28,18 @@ namespace Small_Library
                     return Task.CompletedTask;
                 };
             });
+
+            builder.Services.AddRateLimiter(options =>
+            {
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "global",
+                        factory: _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 10,
+                            Window = TimeSpan.FromMinutes(1)
+                        }));
+            });
             
             builder.Services.AddDbContext<LibraryDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("cs")));
@@ -43,6 +56,13 @@ namespace Small_Library
 
             builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
             builder.Services.AddScoped<IBookService, BookService>();
+            builder.Services.AddScoped<IAuditService, AuditService>();
+
+            builder.Services.AddControllers(options =>
+            {
+                options.Filters.Add<GlobalExceptionFilter>();
+            });
+            
             var app = builder.Build();
             
             if (!app.Environment.IsDevelopment())
@@ -52,6 +72,8 @@ namespace Small_Library
             app.UseStaticFiles();
 
             app.UseRouting();
+
+            app.UseRateLimiter();
             
             app.UseAuthentication();
 

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Small_Library.Models;
+using Small_Library.Services;
 using Small_Library.ViewModels;
 
 namespace Small_Library.Controllers;
@@ -10,11 +11,14 @@ public class AccountController : Controller
     private readonly UserManager<IdentityUser> _userManager;
     private readonly SignInManager<IdentityUser> _signInManager;
     private readonly RoleManager<IdentityRole> _roleManager;
-    public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,RoleManager<IdentityRole> roleManager)
+    private readonly IAuditService _auditService;
+    
+    public AccountController(UserManager<IdentityUser> userManager, SignInManager<IdentityUser> signInManager,RoleManager<IdentityRole> roleManager, IAuditService auditService)
     {
         _userManager = userManager;
         _signInManager = signInManager;
         _roleManager = roleManager;
+        _auditService = auditService;
     }
 
     [HttpGet]
@@ -38,6 +42,14 @@ public class AccountController : Controller
             if (result.Succeeded)
             {
                 await _signInManager.SignInAsync(user, isPersistent: false);
+                
+                var ip = HttpContext.Connection.RemoteIpAddress.ToString();
+                await _auditService.LogActionAsync(
+                    user.Id,
+                    "Register",
+                    $"{user.Id} had registered successfully.",
+                    ip
+                );
                 return RedirectToAction("Index", "Home");
             }
             foreach (var Error in result.Errors)
@@ -67,6 +79,15 @@ public class AccountController : Controller
                 if (result)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
+                    
+                    var ip = HttpContext.Connection.RemoteIpAddress.ToString();
+                    await _auditService.LogActionAsync(
+                        user.Id,
+                        "Login",
+                        $"{user.Id} had logged in.",
+                        ip
+                    );
+                    
                     return RedirectToAction("Index", "Home");
                 }
             }
@@ -78,6 +99,15 @@ public class AccountController : Controller
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
+        
+        var user = await _userManager.FindByNameAsync(User.Identity.Name);
+        var ip = HttpContext.Connection.RemoteIpAddress.ToString();
+        await _auditService.LogActionAsync(
+            user.Id,
+            "Logout",
+            $"{user.Id} had logged out.",
+            ip
+        );
         return RedirectToAction("Login", "Account");
     }
     
