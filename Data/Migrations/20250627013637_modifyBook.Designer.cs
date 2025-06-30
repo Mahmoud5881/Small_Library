@@ -6,10 +6,11 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Small_Library;
+using Small_Library.Data;
 
 #nullable disable
 
-namespace Small_Library.Migrations
+namespace Small_Library.Data.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
     [Migration("20250627013637_modifyBook")]

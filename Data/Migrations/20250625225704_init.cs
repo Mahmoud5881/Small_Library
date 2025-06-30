@@ -1,9 +1,10 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Small_Library.Data;
 
 #nullable disable
 
-namespace Small_Library.Migrations
+namespace Small_Library.Data.Migrations
 {
     /// <inheritdoc />
     public partial class init : Migration

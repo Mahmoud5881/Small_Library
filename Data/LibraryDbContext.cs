@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Small_Library.Models;
 using Small_Library.ViewModels;
 
-namespace Small_Library;
+namespace Small_Library.Data;
 
 public class LibraryDbContext : IdentityDbContext<IdentityUser,IdentityRole, string>
 {

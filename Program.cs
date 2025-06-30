@@ -6,6 +6,7 @@ using Small_Library.Models;
 using Small_Library.Services;
 using Microsoft.Extensions.Options;
 using System.Threading.RateLimiting;
+using Small_Library.Data;
 
 namespace Small_Library
 {
@@ -36,8 +37,8 @@ namespace Small_Library
                         partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "global",
                         factory: _ => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = 10,
-                            Window = TimeSpan.FromMinutes(1)
+                            PermitLimit = 100,
+                            Window = TimeSpan.FromMinutes(5)
                         }));
             });
             

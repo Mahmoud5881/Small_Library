@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Small_Library.Migrations
+namespace Small_Library.Data.Migrations
 {
     /// <inheritdoc />
     public partial class editBook : Migration

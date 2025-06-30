@@ -8,7 +8,7 @@ using Small_Library;
 
 #nullable disable
 
-namespace Small_Library.Migrations
+namespace Small_Library.Data.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
     partial class LibraryDbContextModelSnapshot : ModelSnapshot

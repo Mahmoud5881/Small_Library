@@ -8,16 +8,17 @@
     <link rel="stylesheet" href="~/css/books.css" asp-append-version="true" />
 </head>
 <body>
-<div style="margin: 10px 0; display: flex; justify-content: space-between; align-items: center; width: 100%;">
-    <input type="text" id="searchInput" oninput="GetData()" placeholder="Search books..." style="padding: 15px; border-radius: 25px; border: 1px solid #ccc; width: 300px; font-family: 'Palanquin', sans-serif;" />
-    @if (User.IsInRole("Admin"))
-    {
-        <div class="d-flex gap-2">
-            <a href="#" onclick="openAddModal()" class="btn btn-outline-secondary" style="border-radius: 50px; padding: 8px 16px; font-family: 'Palanquin', sans-serif; font-weight: 500; background-color: white; color: #444444; border: 2px solid #444444;">Add New</a>
-            <a href="#" onclick="openAssignModal()" class="btn btn-outline-secondary" style="border-radius: 50px; padding: 8px 16px; font-family: 'Palanquin', sans-serif; font-weight: 500; background-color: white; color: #444444; border: 2px solid #444444;">Assign Book</a>
-        </div>
-    }
-</div>
+    @Html.AntiForgeryToken()
+    <div style="margin: 10px 0; display: flex; justify-content: space-between; align-items: center; width: 100%;">
+        <input type="text" id="searchInput" oninput="GetData()" placeholder="Search books..." style="padding: 15px; border-radius: 25px; border: 1px solid #ccc; width: 300px; font-family: 'Palanquin', sans-serif;" />
+        @if (User.IsInRole("Admin"))
+        {
+            <div class="d-flex gap-2">
+                <a href="#" onclick="openAddModal()" class="btn btn-outline-secondary" style="border-radius: 50px; padding: 8px 16px; font-family: 'Palanquin', sans-serif; font-weight: 500; background-color: white; color: #444444; border: 2px solid #444444;">Add New</a>
+                <a href="#" onclick="openAssignModal()" class="btn btn-outline-secondary" style="border-radius: 50px; padding: 8px 16px; font-family: 'Palanquin', sans-serif; font-weight: 500; background-color: white; color: #444444; border: 2px solid #444444;">Assign Book</a>
+            </div>
+        }
+    </div>
     <div style="margin: 20px 0;">
         <a href="#" onclick="ShowAll(event)"><button type="button" class="filter-button all-btn">All Books</button></a>
         <a href="#" onclick="ShowAvailable(event)"><button type="button" class="filter-button available-btn">Available Books</button></a>
@@ -37,6 +38,7 @@
             <span class="close">&times;</span>
             <h3>Edit Book</h3>
             <form id="editBookForm">
+                @Html.AntiForgeryToken()
                 <input type="hidden" id="editBookId" />
                 <div class="form-group">
                     <label for="editTitle">Title:</label>
@@ -68,6 +70,7 @@
             <span class="close">&times;</span>
             <h3>Add New Book</h3>
             <form id="addBookForm">
+                @Html.AntiForgeryToken()
                 <div class="form-group">
                     <label for="addTitle">Title:</label>
                     <input type="text" id="addTitle" required />
@@ -98,6 +101,7 @@
             <span class="close">&times;</span>
             <h3>Assign Book</h3>
             <form id="assignBookForm">
+                @Html.AntiForgeryToken()
                 <div class="form-group">
                     <label for="assignBookId">Select Book:</label>
                     <select id="assignBookId" required>
@@ -127,6 +131,7 @@
             <span class="close">&times;</span>
             <h3>Borrow Book</h3>
             <form id="borrowBookForm">
+                @Html.AntiForgeryToken()
                 <input type="hidden" id="borrowBookId" />
                 <div class="form-group">
                     <label for="borrowReturnDate">Return Date:</label>
@@ -217,11 +222,36 @@
             });
         }
 
+        function returnBook(bookId) {
+            if (confirm('Are you sure you want to return this book?')) {
+                var token = $('input[name="__RequestVerificationToken"]').val();
+                $.ajax({
+                    url: '/Home/ReturnBook?id=' + bookId,
+                    type: 'POST',
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    success: function(result) {
+                        GetData();
+                        $("#borrowedContainer").load("/Home/GetBorrowers");
+                        alert('Book returned successfully!');
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Failed to return book.');
+                    }
+                });
+            }
+        }
+
         function DeleteBorrowed(event, id) {
             event.preventDefault();
+            var token = $('input[name="__RequestVerificationToken"]').val();
             $.ajax({
                 url: '/Home/ReturnBook?id=' + id,
                 type: 'POST',
+                headers: {
+                    'RequestVerificationToken': token
+                },
                 success: function(result) {
                     // Refresh the current view state
                     GetData();
@@ -280,23 +310,6 @@
             document.getElementById('borrowModal').style.display = 'none';
         }
 
-        function returnBook(bookId) {
-            if (confirm('Are you sure you want to return this book?')) {
-                $.ajax({
-                    url: '/Home/ReturnBook?id=' + bookId,
-                    type: 'POST',
-                    success: function(result) {
-                        GetData();
-                        $("#borrowedContainer").load("/Home/GetBorrowers");
-                        alert('Book returned successfully!');
-                    },
-                    error: function(xhr, status, error) {
-                        alert('Failed to return book.');
-                    }
-                });
-            }
-        }
-
         function loadAvailableBooks() {
             $.ajax({
                 url: '/Home/GetAvailableBooksForAssignment',
@@ -353,12 +366,15 @@
                     Genre: $('#editGenre').val(),
                     PublishedDate: $('#editPublishedDate').val()
                 };
-
+                var token = $('#editBookForm input[name="__RequestVerificationToken"]').val();
                 $.ajax({
                     url: '/Home/UpdateBook',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(bookData),
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
                     success: function(result) {
                         closeEditModal();
                         GetData();
@@ -381,12 +397,15 @@
                     PublishedDate: $('#addPublishedDate').val(),
                     Status: 'Available' // New books are always available
                 };
-
+                var token = $('#addBookForm input[name="__RequestVerificationToken"]').val();
                 $.ajax({
                     url: '/Home/AddBook',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(bookData),
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
                     success: function(result) {
                         closeAddModal();
                         GetData();
@@ -417,12 +436,15 @@
                     BorrowerName: $('#assignBorrower').val(),
                     ReturnDate: $('#assignReturnDate').val()
                 };
-
+                var token = $('#assignBookForm input[name="__RequestVerificationToken"]').val();
                 $.ajax({
                     url: '/Home/AssignBook',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(assignData),
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
                     success: function(result) {
                         closeAssignModal();
                         GetData();
@@ -453,12 +475,15 @@
                     BookId: $('#borrowBookId').val(),
                     ReturnDate: $('#borrowReturnDate').val()
                 };
-
+                var token = $('#borrowBookForm input[name="__RequestVerificationToken"]').val();
                 $.ajax({
                     url: '/Home/BorrowBook',
                     type: 'POST',
                     contentType: 'application/json',
                     data: JSON.stringify(borrowData),
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
                     success: function(result) {
                         closeBorrowModal();
                         GetData();

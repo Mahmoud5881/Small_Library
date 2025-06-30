@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Small_Library.Migrations
+namespace Small_Library.Data.Migrations
 {
     /// <inheritdoc />
     public partial class modifyBook : Migration
